@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة التبليغ والاستجابة المبكرة للأوبئة - ليبيا</title>
+    <!-- Bootstrap 5 RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #0ea5e9;
+            --emerald-accent: #10b981;
+            --danger-accent: #dc3545;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--light-bg);
+            color: #334155;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styling */
+        .navbar-custom {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Hero Section */
+        .hero-banner {
+            background: linear-gradient(rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.88)), 
+                        url('https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+            padding: 80px 20px;
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            padding: 18px 28px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 16px;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(2, 132, 199, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(2, 132, 199, 0.6);
+            color: white;
+        }
+
+        .btn-hero-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 18px 28px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            border-color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Card Customization */
+        .card-custom {
+            border: none;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        }
+
+        /* Views management */
+        .page-view {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        .page-view.active-view {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Metric Cards */
+        .stat-card {
+            border: none;
+            border-radius: 18px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card .stat-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 3rem;
+            opacity: 0.25;
+        }
+
+        .bg-grad-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+        .bg-grad-emerald { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+        .bg-grad-amber { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+        .bg-grad-purple { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); }
+
+        /* Mobile specific enhancements */
+        @media (max-width: 768px) {
+            .hero-banner {
+                padding: 45px 15px;
+            }
+            .btn-hero-primary, .btn-hero-secondary {
+                font-size: 1.1rem;
+                padding: 14px 20px;
+            }
+        }
+
+        /* Toast Container */
+        .toast-container {
+            z-index: 1090;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="switchView('home-view')">
+                <i class="fa-solid fa-hospital-user text-info fs-3"></i>
+                <span class="fw-bold fs-5">منظومة الاستجابة المبكرة للأوبئة</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-semibold">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-home" onclick="switchView('home-view')">
+                            <i class="fa-solid fa-house me-1"></i> الرئيسية
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-report" onclick="switchView('report-view')">
+                            <i class="fa-solid fa-kit-medical me-1"></i> طلب مساعدة / تبليغ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-login" onclick="switchView('login-view')">
+                            <i class="fa-solid fa-user-shield me-1"></i> لوحة الإدارة
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+                    <a href="tel:1415" class="btn btn-outline-danger fw-bold rounded-pill px-3 animate-pulse">
+                        <i class="fa-solid fa-phone-flip me-1"></i> الطوارئ: 1415
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area Container -->
+    <main class="flex-grow-1">
+
+        <!-- 1. HOME PAGE VIEW -->
+        <div id="home-view" class="page-view active-view">
+            <!-- Hero Banner -->
+            <div class="hero-banner text-center mb-5">
+                <div class="container">
+                    <span class="badge bg-danger px-3 py-2 fs-6 rounded-pill mb-3">
+                        <i class="fa-solid fa-circle-exclamation me-1"></i> الخط الساخن للبلاغات الطبية المستعجلة
+                    </span>
+                    <h1 class="display-5 fw-extrabold mb-3">منظومة التبليغ والاستجابة الفورية للحالات المعدية</h1>
+                    <p class="lead mb-4 text-light max-w-75 mx-auto" style="max-width: 750px;">
+                        المنصة الوطنية الموحدة لتلقي بلاغات الإصابة بالأوبئة والأمراض المعدية في ليبيا وتوجيه الفرق الطبية الميدانية لتوفير الرعاية الفورية.
+                    </p>
+                    
+                    <!-- Action Buttons -->
+                    <div class="row g-3 justify-content-center mt-4">
+                        <div class="col-12 col-md-6 col-lg-5">
+                            <button class="btn btn-hero-primary w-full shadow-lg" onclick="switchView('report-view')">
+                                <i class="fa-solid fa-hand-holding-medical fs-3"></i>
+                                <span>طلب مساعدة طبية / تبليغ عن حالة</span>
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-5">
+                            <button class="btn btn-hero-secondary w-full" onclick="switchView('login-view')">
+                                <i class="fa-solid fa-id-card-clip fs-3"></i>
+                                <span>الدخول إلى لوحة الإدارة</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mb-5">
+                <!-- Services Cards -->
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-dark mb-2">خدمات المنظومة الطبية</h2>
+                    <p class="text-muted">نعمل على مدار 24 ساعة للسيطرة على انتشار العدوى وتقديد الرعاية الصحية</p>
+                </div>
+                <div class="row g-4 mb-5">
+                    <div class="col-12 col-md-4">
+                        <div class="card card-custom p-4 h-100 text-center">
+                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-3 mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-truck-medical fs-2"></i>
+                            </div>
+                            <h4 class="fw-bold mb-2">استجابة سريعة</h4>
+                            <p class="text-muted fs-6">تحريك الفرق الطبية الميدانية وسيارات الإسعاف المجهزة للحالات الحادّة فور تقديم البلاغ.</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-custom p-4 h-100 text-center">
+                            <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-user-doctor fs-2"></i>
+                            </div>
+                            <h4 class="fw-bold mb-2">استشارات ودعم طبي</h4>
+                            <p class="text-muted fs-6">فريق كامل من الأطباء المتخصصين في الأمراض السارية والمعدية لتقديم التوجيه المنزلي.</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-custom p-4 h-100 text-center">
+                            <div class="rounded-circle bg-warning bg-opacity-10 text-warning p-3 mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-chart-line fs-2"></i>
+                            </div>
+                            <h4 class="fw-bold mb-2">تتبع ومكافحة الأوبئة</h4>
+                            <p class="text-muted fs-6">رصد البؤر الوبائية جغرافياً واتخاذ إجراءات العزل والوقاية المبكرة لحماية المجتمع.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info & Guidelines Section -->
+                <div class="card card-custom p-4 p-md-5 mb-5 bg-white border-start border-4 border-info">
+                    <div class="row align-items-center g-4">
+                        <div class="col-12 col-lg-7">
+                            <h3 class="fw-bold text-dark mb-3">
+                                <i class="fa-solid fa-shield-virus text-info me-2"></i> إرشادات وقائية مهمة عند اشتباه العدوى
+                            </h3>
+                            <ul class="list-unstyled lh-lg text-secondary">
+                                <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>العزل الفوري:</strong> ابقَ في غرفة منفصلة وتجنب الاختلاط الكلي بأفراد الأقارب أو العائلة.</li>
+                                <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>ارتداء الكمامة:</strong> احرص على تغطية الفم والأنف عند التعامل مع أي فرد للضرورة.</li>
+                                <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>التهوية الجيدة:</strong> تأكد من فتح النوافذ لتجديد الهواء داخل مكان التواجد.</li>
+                                <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>تقديم البلاغ الدقيق:</strong> عبّئ نموذج التبليغ بالبيانات الصحيحة لتسهيل وصول الفريق الميداني.</li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-lg-5 text-center">
+                            <img src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="إرشادات الوقاية">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact Strip -->
+                <div class="bg-dark text-white rounded-4 p-4 text-center d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 shadow">
+                    <div class="text-md-start">
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-phone-volume text-danger me-2"></i> غرفة عمليات الطوارئ المركزية</h4>
+                        <p class="mb-0 text-gray-300">متواجدون على طوال 24 ساعة لاستقبال الحالات الحرجة في كافة المدن والمناطق</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="tel:1415" class="btn btn-danger btn-lg rounded-pill fw-bold px-4">
+                            <i class="fa-solid fa-phone me-1"></i> اتصل بـ 1415
+                        </a>
+                        <a href="tel:191" class="btn btn-outline-light btn-lg rounded-pill fw-bold px-4">
+                            <i class="fa-solid fa-phone me-1"></i> 191
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. REPORT / HELP FORM VIEW -->
+        <div id="report-view" class="page-view py-4">
+            <div class="container max-w-800" style="max-width: 850px;">
+                <div class="card card-custom p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6 rounded-pill mb-2">
+                            <i class="fa-solid fa-notes-medical me-1"></i> نموذج بلاغ صحي مستعجل
+                        </span>
+                        <h2 class="fw-bold text-dark">طلب مساعدة طبية / تبليغ عن حالة</h2>
+                        <p class="text-muted">الرجاء إدخال البيانات بدقة لضمان سرعة الاستجابة الطبية والتواصل المباشر</p>
+                    </div>
+
+                    <form id="emergency-report-form" onsubmit="handleReportSubmit(event)">
+                        <div class="row g-3">
+                            <!-- Patient Name -->
+                            <div class="col-12 col-md-8">
+                                <label class="form-label fw-semibold">اسم المريض الثلاثي <span class="text-danger">*</span></label>
+                                <input type="text" id="patientName" class="form-control form-control-lg rounded-3" placeholder="مثال: أحمد محمد الفيتوري" required>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label fw-semibold">الجنس <span class="text-danger">*</span></label>
+                                <select id="patientGender" class="form-select form-select-lg rounded-3" required>
+                                    <option value="" selected disabled>اختر الجنس...</option>
+                                    <option value="ذكر">ذكر</option>
+                                    <option value="أنثى">أنثى</option>
+                                </select>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">رقم الهاتف للتواصل <span class="text-danger">*</span></label>
+                                <input type="tel" id="patientPhone" class="form-control form-control-lg rounded-3" placeholder="09X XXXXXXX" required>
+                            </div>
+
+                            <!-- Age -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">العمر (بالسنوات) <span class="text-danger">*</span></label>
+                                <input type="number" id="patientAge" class="form-control form-control-lg rounded-3" min="0" max="120" placeholder="مثال: 35" required>
+                            </div>
+
+                            <!-- Suspected Epidemic / Disease -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">نوع الجائحة / المرض المشتبه به <span class="text-danger">*</span></label>
+                                <select id="diseaseType" class="form-select form-select-lg rounded-3" required>
+                                    <option value="" selected disabled>حدد نوع المرض المشتبه فيه...</option>
+                                    <option value="فيروس كورونا (Covid-19)">فيروس كورونا (Covid-19)</option>
+                                    <option value="الدرن (السل الرئوي)">الدرن (السل الرئوي)</option>
+                                    <option value="حمى الضنك">حمى الضنك</option>
+                                    <option value="جدري القردة">جدري القردة</option>
+                                    <option value="فيروس الإيبولا">فيروس الإيبولا</option>
+                                    <option value="الكوليرا">الكوليرا</option>
+                                    <option value="أخرى / غير مشخص">أخرى / أعراض غير مشخصة</option>
+                                </select>
+                            </div>
+
+                            <!-- Symptoms Details -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">الأعراض الظاهرة تفصيلياً <span class="text-danger">*</span></label>
+                                <textarea id="patientSymptoms" class="form-control rounded-3" rows="3" placeholder="مثال: ارتفاع درجة الحرارة، ضيق في التنفس، طفح جلدي، إرهاق شديد..." required></textarea>
+                            </div>
+
+                            <!-- Location & Auto Detect -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">موقع/عنوان الحالة (المدينة / المنطقة) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" id="patientLocation" class="form-control form-control-lg rounded-start-3" placeholder="مثال: طرابلس - حي الأندلس" required>
+                                    <button type="button" class="btn btn-outline-secondary fw-semibold px-3" onclick="detectLocation()">
+                                        <i class="fa-solid fa-location-crosshairs text-primary me-1"></i> تحديد الموقع تلقائياً
+                                    </button>
+                                </div>
+                                <small id="locationStatus" class="text-muted d-block mt-1 fs-7"></small>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row g-3 mt-4">
+                            <div class="col-12 col-md-6">
+                                <button type="submit" class="btn btn-success btn-lg w-full fw-bold py-3 rounded-3 shadow">
+                                    <i class="fa-solid fa-paper-plane me-2"></i> تقديم طلب المساعدة والتبليغ
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <a href="tel:1415" class="btn btn-danger btn-lg w-full fw-bold py-3 rounded-3 text-white">
+                                    <i class="fa-solid fa-phone-shake me-2"></i> اتصال مباشر بالطوارئ (1415)
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ADMIN LOGIN VIEW -->
+        <div id="login-view" class="page-view py-5">
+            <div class="container max-w-500" style="max-width: 480px;">
+                <div class="card card-custom p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-dark text-white p-3 mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-user-lock fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark">تسجيل الدخول للوحة التحكم</h3>
+                        <p class="text-muted fs-6">نسخة تجريبية Demo (يمكن إدخال أي بيانات للعبور)</p>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">البريد الإلكتروني / اسم المستخدم</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" class="form-control form-control-lg" placeholder="admin@moh.gov.ly" required value="admin@moh.gov.ly">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">كلمة المرور</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-key text-muted"></i></span>
+                                <input type="password" class="form-control form-control-lg" placeholder="••••••••" required value="demo123">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-full fw-bold rounded-3">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> الدخول إلى اللوحة
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DASHBOARD VIEW -->
+        <div id="dashboard-view" class="page-view py-4">
+            <div class="container">
+                <!-- Dashboard Header Bar -->
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3 bg-white p-3 rounded-4 shadow-sm">
+                    <div>
+                        <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-chart-pie text-primary me-2"></i> لوحة الإدارة ومكافحة الأوبئة</h3>
+                        <p class="text-muted mb-0 fs-6">متابعة البلاغات الميدانية وإحصائيات الكادر الطبي والفرق المساعدة</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success px-3 py-2 fs-6 rounded-pill">
+                            <i class="fa-solid fa-circle-dot me-1 animate-pulse"></i> النظام يعمل مباشرة
+                        </span>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill fw-semibold px-3" onclick="logoutAdmin()">
+                            <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> خروج
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stat Cards Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-card bg-grad-blue">
+                            <i class="fa-solid fa-hospital-user stat-icon"></i>
+                            <span class="d-block text-white-50 fw-semibold mb-1">إجمالي المرضى والبلاغات</span>
+                            <h2 class="display-6 fw-bold mb-0" id="stat-total-patients">5</h2>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-card bg-grad-emerald">
+                            <i class="fa-solid fa-user-doctor stat-icon"></i>
+                            <span class="d-block text-white-50 fw-semibold mb-1">إجمالي الكادر الطبي</span>
+                            <h2 class="display-6 fw-bold mb-0">142</h2>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-card bg-grad-amber">
+                            <i class="fa-solid fa-truck-medical stat-icon"></i>
+                            <span class="d-block text-white-50 fw-semibold mb-1">الفرق الطبية الميدانية</span>
+                            <h2 class="display-6 fw-bold mb-0">38</h2>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="stat-card bg-grad-purple">
+                            <i class="fa-solid fa-microscope stat-icon"></i>
+                            <span class="d-block text-white-50 fw-semibold mb-1">الاستجابات المكتملة</span>
+                            <h2 class="display-6 fw-bold mb-0">89%</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Tables / Info Row -->
+                <div class="row g-4 mb-4">
+                    <!-- Pandemic Breakdown -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card card-custom h-100 p-4">
+                            <h5 class="fw-bold text-dark mb-3">
+                                <i class="fa-solid fa-virus text-danger me-2"></i> توزيع حالات البلاغات حسب الجائحة
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>الجائحة / المرض</th>
+                                            <th>عدد الحالات المسجلة</th>
+                                            <th>مستوى الخطورة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="disease-breakdown-body">
+                                        <!-- Dynamically generated in JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctors Specialty Breakdown -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card card-custom h-100 p-4">
+                            <h5 class="fw-bold text-dark mb-3">
+                                <i class="fa-solid fa-user-md text-primary me-2"></i> توزيع الأطباء المتخصصين حسب الأوبئة
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>التخصص الوبائي</th>
+                                            <th>عدد الأطباء المتخصصين</th>
+                                            <th>حالة الجاهزية</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="fa-solid fa-lungs text-info me-2"></i> أمراض صدرية وفيروسات (كورونا / الدرن)</td>
+                                            <td><span class="fw-bold">54 طبيباً</span></td>
+                                            <td><span class="badge bg-success">جاهزية عالية</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fa-solid fa-bug text-warning me-2"></i> حمى المناطق الحارة (حمى الضنك)</td>
+                                            <td><span class="fw-bold">28 طبيباً</span></td>
+                                            <td><span class="badge bg-success">جاهزية عالية</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fa-solid fa-head-side-virus text-primary me-2"></i> أمراض جلدية وسارية (جدري القردة)</td>
+                                            <td><span class="fw-bold">22 طبيباً</span></td>
+                                            <td><span class="badge bg-primary">متاحة</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="fa-solid fa-biohazard text-danger me-2"></i> الأوبئة النزفية والحادة (الإيبولا / الكوليرا)</td>
+                                            <td><span class="fw-bold">38 طبيباً</span></td>
+                                            <td><span class="badge bg-danger">تدخل سريع</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Patient Reports Table -->
+                <div class="card card-custom p-4 mb-4">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3 gap-2">
+                        <div>
+                            <h4 class="fw-bold text-dark mb-1"><i class="fa-solid fa-clipboard-list text-info me-2"></i> جدول البلاغات الواردة والتفاصيل الميدانية</h4>
+                            <p class="text-muted mb-0 fs-6">قائمة البلاغات المسجلة من مختلف مدن ليبيا مع التحديث الفوري</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border text-nowrap">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>اسم المريض</th>
+                                    <th>الجنس / العمر</th>
+                                    <th>رقم الهاتف</th>
+                                    <th>المدينة / الموقع</th>
+                                    <th>الجائحة المشتبهة</th>
+                                    <th>الأعراض</th>
+                                    <th>تاريخ التبليغ</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white-50 py-4 mt-auto border-top border-secondary">
+        <div class="container text-center">
+            <p class="mb-1 text-white">منظومة التبليغ والاستجابة المبكرة للأوبئة - وزارة الصحة</p>
+            <small class="text-muted">جميع الحقوق محفوظة &copy; 2026 - نسخة تجريبية سريعة الاستجابة للهواتف المحمولة</small>
+        </div>
+    </footer>
+
+    <!-- Notification Toast Container -->
+    <div class="toast-container position-fixed bottom-0 start-0 p-3">
+        <div id="liveToast" class="toast align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fs-6 fw-semibold" id="toastMessage">
+                    <i class="fa-solid fa-circle-check me-2"></i> تم تقديم البلاغ بنجاح!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 Bundle with Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Demo Initial Data (5 Patient Reports from Libyan Cities)
+        const demoReports = [
+            {
+                id: 1,
+                name: "علي سالم الفسي",
+                gender: "ذكر",
+                age: 42,
+                phone: "0912345678",
+                location: "بنغازي - الكويفية",
+                disease: "فيروس كورونا (Covid-19)",
+                symptoms: "حُمى شديدة، ضيق تنفس، فقدان حس الشم والتذوق",
+                date: "2026-11-10 14:30",
+                status: "قيد المتابعة"
+            },
+            {
+                id: 2,
+                name: "فاطمة عمر الزوي",
+                gender: "أنثى",
+                age: 29,
+                phone: "0929876543",
+                location: "سبها - القرضة",
+                disease: "حمى الضنك",
+                symptoms: "صداع حاد، ألام شديدة بالخلف العينين والمفاصل، طفح جلدي",
+                date: "2026-11-11 09:15",
+                status: "تم توجيه فريق"
+            },
+            {
+                id: 3,
+                name: "مفتاح طارق المقرحي",
+                gender: "ذكر",
+                age: 55,
+                phone: "0917765432",
+                location: "طرابلس - عين زارة",
+                disease: "الدرن (السل الرئوي)",
+                symptoms: "سعال مستمر منذ أسابيع مع دم، تعرق ليلي، نقص وزن حاد",
+                date: "2026-11-11 11:00",
+                status: "قيد المتابعة"
+            },
+            {
+                id: 4,
+                name: "مريم عبدالسلام السويحلي",
+                gender: "أنثى",
+                age: 34,
+                phone: "0943322110",
+                location: "مصراتة - الرويسات",
+                disease: "جدري القردة",
+                symptoms: "انتفاخ العقد اللمفاوية، بثرات جلدية ملحوظة بالأيدي والوجه",
+                date: "2026-11-11 12:45",
+                status: "تم العزل الفوري"
+            },
+            {
+                id: 5,
+                name: "عبدالله الصيد الزنتاني",
+                gender: "ذكر",
+                age: 48,
+                phone: "0915544332",
+                location: "الزنتان - الجبل الغربي",
+                disease: "الكوليرا",
+                symptoms: "إسهال مائي حاد مستمر، جفاف شديد، هبوط بالضغط",
+                date: "2026-11-11 13:20",
+                status: "تم توجيه فريق"
+            }
+        ];
+
+        // Global State
+        let reportsList = [...demoReports];
+
+        // Navigation View Switcher
+        function switchView(viewId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.remove('active-view');
+            });
+
+            // Show selected page
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active-view');
+            }
+
+            // Update navbar active state
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            if (viewId === 'home-view') document.getElementById('nav-home').classList.add('active');
+            if (viewId === 'report-view') document.getElementById('nav-report').classList.add('active');
+            if (viewId === 'login-view' || viewId === 'dashboard-view') document.getElementById('nav-login').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // If entering dashboard, refresh dashboard content
+            if (viewId === 'dashboard-view') {
+                renderDashboard();
+            }
+        }
+
+        // Auto Location Detector Simulation / Geolocation API
+        function detectLocation() {
+            const statusEl = document.getElementById('locationStatus');
+            const locInput = document.getElementById('patientLocation');
+
+            statusEl.innerText = "جاري الكشف عن موقعك الجغرافي...";
+            statusEl.className = "text-primary d-block mt-1 fs-7";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(4);
+                        const lng = position.coords.longitude.toFixed(4);
+                        locInput.value = `طرابلس (إحداثيات: ${lat}, ${lng})`;
+                        statusEl.innerText = "تم استخراج الموقع بنجاح!";
+                        statusEl.className = "text-success d-block mt-1 fs-7";
+                    },
+                    (error) => {
+                        // Fallback simulated locations for Demo
+                        const demoCities = [
+                            "طرابلس - سوق الجمعة",
+                            "بنغازي - الحدائق",
+                            "مصراتة - كرزاز",
+                            "سبها - المنشية",
+                            "الزاوية - الوسط"
+                        ];
+                        const randomCity = demoCities[Math.floor(Math.random() * demoCities.length)];
+                        locInput.value = randomCity;
+                        statusEl.innerText = "تم تحديد التقدير الجغرافي التلقائي بنجاح.";
+                        statusEl.className = "text-success d-block mt-1 fs-7";
+                    }
+                );
+            } else {
+                locInput.value = "طرابلس - المركز";
+                statusEl.innerText = "تم إدراج العاصمة افتراضياً.";
+            }
+        }
+
+        // Form Submission Handling
+        function handleReportSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('patientName').value.trim();
+            const gender = document.getElementById('patientGender').value;
+            const phone = document.getElementById('patientPhone').value.trim();
+            const age = document.getElementById('patientAge').value;
+            const disease = document.getElementById('diseaseType').value;
+            const symptoms = document.getElementById('patientSymptoms').value.trim();
+            const location = document.getElementById('patientLocation').value.trim();
+
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            const newReport = {
+                id: reportsList.length + 1,
+                name: name,
+                gender: gender,
+                age: age,
+                phone: phone,
+                location: location,
+                disease: disease,
+                symptoms: symptoms,
+                date: dateStr,
+                status: "جديد (بلاغ عاجل)"
+            };
+
+            // Add to the top of list
+            reportsList.unshift(newReport);
+
+            // Reset Form
+            document.getElementById('emergency-report-form').reset();
+            document.getElementById('locationStatus').innerText = "";
+
+            // Show Toast Notification
+            showToast(`تم استلام بلاغ المريض (${name}) بنجاح! تم تحريك أقرب فريق طبي.`);
+
+            // Redirect to Dashboard after brief delay to show data
+            setTimeout(() => {
+                switchView('dashboard-view');
+            }, 1500);
+        }
+
+        // Handle Demo Admin Login
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            showToast("تم تسجيل الدخول بنجاح إلى لوحة الإدارة");
+            switchView('dashboard-view');
+        }
+
+        function logoutAdmin() {
+            showToast("تم خروج المسئول من لوحة الإدارة");
+            switchView('home-view');
+        }
+
+        // Render Dashboard Data & Tables
+        function renderDashboard() {
+            // Update Stat Count
+            document.getElementById('stat-total-patients').innerText = reportsList.length;
+
+            // Render Reports Table
+            const tbody = document.getElementById('reports-table-body');
+            tbody.innerHTML = '';
+
+            reportsList.forEach((rep) => {
+                let statusBadge = 'bg-warning text-dark';
+                if (rep.status.includes('جديد')) statusBadge = 'bg-danger text-white animate-pulse';
+                if (rep.status.includes('توجيه')) statusBadge = 'bg-info text-dark';
+                if (rep.status.includes('العزل')) statusBadge = 'bg-purple text-white bg-dark';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">#${rep.id}</td>
+                    <td class="fw-bold text-dark">${rep.name}</td>
+                    <td>${rep.gender} / ${rep.age} سنة</td>
+                    <td><a href="tel:${rep.phone}" class="text-decoration-none fw-semibold"><i class="fa-solid fa-phone text-success me-1"></i>${rep.phone}</a></td>
+                    <td><i class="fa-solid fa-location-dot text-danger me-1"></i>${rep.location}</td>
+                    <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1">${rep.disease}</span></td>
+                    <td class="text-truncate" style="max-width: 180px;" title="${rep.symptoms}">${rep.symptoms}</td>
+                    <td><small class="text-muted">${rep.date}</small></td>
+                    <td><span class="badge ${statusBadge} px-3 py-2 rounded-pill">${rep.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Calculate Breakdown per Pandemic
+            const diseaseCounts = {};
+            reportsList.forEach(r => {
+                diseaseCounts[r.disease] = (diseaseCounts[r.disease] || 0) + 1;
+            });
+
+            const breakdownBody = document.getElementById('disease-breakdown-body');
+            breakdownBody.innerHTML = '';
+
+            const allDiseasesList = [
+                "فيروس كورونا (Covid-19)",
+                "الدرن (السل الرئوي)",
+                "حمى الضنك",
+                "جدري القردة",
+                "فيروس الإيبولا",
+                "الكوليرا"
+            ];
+
+            allDiseasesList.forEach(dis => {
+                const count = diseaseCounts[dis] || 0;
+                let riskLevel = '<span class="badge bg-secondary">مستقر</span>';
+                if (count >= 2) riskLevel = '<span class="badge bg-danger">مرتفع (متابعة دقيقة)</span>';
+                else if (count === 1) riskLevel = '<span class="badge bg-warning text-dark">متوسط</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-semibold">${dis}</td>
+                    <td><span class="fs-6 fw-bold text-primary">${count} حالة</span></td>
+                    <td>${riskLevel}</td>
+                `;
+                breakdownBody.appendChild(tr);
+            });
+        }
+
+        // Utility Toast function
+        function showToast(msg) {
+            document.getElementById('toastMessage').innerHTML = `<i class="fa-solid fa-bell me-2"></i> ${msg}`;
+            const toastEl = document.getElementById('liveToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set home view as active on load
+            switchView('home-view');
+        });
+    </script>
+</body>
+</html>
